@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center mb-4">Weather Dashboard</h1>
+
+{% if user.is_authenticated %}
+<div class="text-end mb-3">
+    <p>Welcome, <strong>{{ user.username }}</strong>! <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm">Logout</a></p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="post" action="{% url 'add_favorite' %}" class="d-flex">
+            {% csrf_token %}
+            <input type="text" name="city_name" class="form-control me-2" placeholder="Enter city" required>
+            <button type="submit" class="btn btn-primary">Add to Favorites</button>
+        </form>
+    </div>
+</div>
+
+<h2>Your Favorite Cities</h2>
+<div class="row">
+    {% for city in weather_data %}
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ city.name }}</h5>
+                <p class="card-text">
+                    Temperature: {{ city.main.temp }}°C<br>
+                    Weather: {{ city.weather.0.description }}
+                </p>
+                <form method="post" action="{% url 'remove_favorite' city.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center">
+    <p>Please <a href="{% url 'login' %}">log in</a> to see your favorite cities.</p>
+</div>
+{% endif %}
+{% endblock content %}
